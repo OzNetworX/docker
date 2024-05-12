@@ -1,0 +1,30 @@
+version: '3'
+services:
+  homarr:
+    container_name: homarr
+    image: ghcr.io/ajnart/homarr:latest
+    restart: unless-stopped
+    networks:
+      - ${NETWORK}
+    volumes:
+      - ${CONFIGS_PATH}:/app/data/configs
+      - ${DATA_PATH}:/data
+      - ${ICONS_PATH}:/app/public/icons
+      - ${DOCKER_SOCKET_PATH}:/var/run/docker.sock
+    ports:
+      - "${HOMARR_PORT}:7575"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homarr.entrypoints=http"
+      - "traefik.http.routers.homarr.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.middlewares.homarr-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.homarr.middlewares=homarr-https-redirect"
+      - "traefik.http.routers.homarr-secure.entrypoints=https"
+      - "traefik.http.routers.homarr-secure.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.routers.homarr-secure.tls=true"
+      - "traefik.http.routers.homarr-secure.service=homarr"
+      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
+
+networks:
+  ${NETWORK}:
+    external: true

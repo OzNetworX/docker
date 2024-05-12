@@ -1,0 +1,45 @@
+version: "3"
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    networks:
+      - ${NETWORK_NAME}
+    # line above must be uncommented to allow external containers to connect.
+    # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md#external-container-to-gluetun
+    cap_add:
+      - NET_ADMIN
+    # devices:
+    #  - /dev/net/tun:/dev/net/tun
+    ports:
+      - ${PORT_6881}:6881
+      - ${PORT_6881}:6881/udp
+      - ${PORT_8080}:8080 # qbittorrent
+      - ${PORT_9117}:9117 # Jackett
+      - ${PORT_8989}:8989 # Sonarr
+      - ${PORT_9696}:9696 # Prowlarr
+      - ${PORT_6767}:6767 # Bazarr
+      - ${PORT_3579}:3579 # Ombi
+      - ${PORT_7878}:7878 # Radarr
+    volumes:
+      - ${GLUETUN_DATA_VOLUME}:/gluetun
+    environment:
+      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      # VPN_TYPE=wireguard
+      # OpenVPN:
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - SERVER_REGIONS=${SERVER_REGIONS}
+      # Wireguard:
+      # WIREGUARD_PRIVATE_KEY=<YOUR_PRIVATE_KEY> # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/nordvpn.md#obtain-your-wireguard-private-key
+      # WIREGUARD_ADDRESSES=10.5.0.2/32
+      # Timezone for accurate log times
+      - TZ=${TZ}
+      # Server list updater
+      # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/servers.md#update-the-vpn-servers-list
+      - UPDATER_PERIOD=${UPDATER_PERIOD}
+
+networks:
+  ${NETWORK_NAME}:
+    external: true

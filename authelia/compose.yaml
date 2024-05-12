@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  authelia:
+    image: authelia/authelia
+    container_name: authelia
+    networks:
+      - ${NETWORK}
+    volumes:
+      - ${CONFIG_VOLUME}:/config #change this to a shared folder on your system. DO NOT use a "volume"
+    ports:
+      - ${AUTH_PORT}:9091
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+
+networks:
+  ${NETWORK}:
+    external: true

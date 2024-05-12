@@ -1,0 +1,31 @@
+version: "2.1"
+
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    ports:
+      - ${PLEX_PORT_HOST}:32400
+    networks:
+      - ${PLEX_NETWORK}
+    environment:
+      - PUID=${PLEX_PUID}
+      - PGID=${PLEX_PGID}
+      - VERSION=${PLEX_VERSION}
+      - PLEX_CLAIM=${PLEX_CLAIM}
+      - TZ=${PLEX_TZ}
+    volumes:
+      - ${PLEX_CONFIG}:/config
+      - ${PLEX_TVSHOWS}:/tv1
+      - ${PLEX_TVSHOWS2}:/tv2
+      - ${PLEX_TVSHOWS3}:/tv3
+      - ${PLEX_TVSHOWS4}:/tv4
+      - ${PLEX_MOVIES}:/movies
+      - ${PLEX_MOVIES2}:/movies2
+      - ${PLEX_UNSORTED}:/unsorted
+    restart: unless-stopped
+
+networks:
+  ${PLEX_NETWORK}:
+    external: ${PLEX_NETWORK_EXTERNAL}
+

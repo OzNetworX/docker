@@ -1,0 +1,33 @@
+version: "2.1"
+services:
+  ombi:
+    image: lscr.io/linuxserver/ombi:latest
+    container_name: ombi
+    networks:
+      - ${NETWORK}
+    ports:
+      - "${REQUEST_PORT}:3579"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - BASE_URL=${BASE_URL}
+    volumes:
+      - ${VOLUME}:/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ombi.entrypoints=http"
+      - "traefik.http.routers.ombi.rule=Host(`${HOST}`)"
+      - "traefik.http.middlewares.ombi-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.ombi.middlewares=ombi-https-redirect"
+      - "traefik.http.routers.ombi-secure.entrypoints=https"
+      - "traefik.http.routers.ombi-secure.rule=Host(`${HOST}`)"
+      - "traefik.http.routers.ombi-secure.tls=true"
+      - "traefik.http.routers.ombi-secure.service=ombi"
+      - "traefik.http.services.ombi.loadbalancer.server.port=3579"
+      - "traefik.docker.network=${NETWORK}"
+    restart: unless-stopped
+
+networks:
+  ${NETWORK}:
+    external: true

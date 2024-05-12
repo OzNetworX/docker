@@ -1,0 +1,38 @@
+version: "2.1"
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    networks:
+      - ${NETWORK}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    ports:
+      - ${SONARR_PORT}:8989
+    volumes:
+      - ${SONARR_CONFIG_VOLUME}:/config
+      - ${TV_SHOWS_VOLUME}:/tv
+      - ${TV_SHOWS_2_VOLUME}:/tv2
+      - ${TV_SHOWS_3_VOLUME}:/tv3
+      - ${TV_SHOWS_4_VOLUME}:/tv4
+      - ${DOWNLOADS_VOLUME}:/downloads
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLE}"
+      - "traefik.http.routers.gettvshows.entrypoints=http"
+      - "traefik.http.routers.gettvshows.rule=Host(`${TRAEFIK_HOSTNAME}`)"
+      - "traefik.http.middlewares.gettvshows-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.gettvshows.middlewares=gettvshows-https-redirect"
+      - "traefik.http.routers.gettvshows-secure.entrypoints=https"
+      - "traefik.http.routers.gettvshows-secure.rule=Host(`${TRAEFIK_HOSTNAME}`)"
+      - "traefik.http.routers.gettvshows-secure.tls=true"
+      - "traefik.http.routers.gettvshows-secure.service=gettvshows"
+      - "traefik.http.services.gettvshows.loadbalancer.server.port=8989"
+      - "traefik.docker.network=${NETWORK}"
+    restart: unless-stopped
+
+networks:
+  ${NETWORK}:
+    external: true
+

@@ -1,0 +1,65 @@
+version: '3.7'
+
+services:
+
+  caddy:
+    container_name: caddy
+    image: caddy:2-alpine
+    network_mode: host
+    volumes:
+      - ${CADDY_VOLUME}:/etc/caddy/Caddyfile:ro
+      - ${CADDY_DATA_VOLUME}:/data:rw
+      - ${CADDY_CONFIG_VOLUME}:/config:rw
+    environment:
+      - SEARXNG_HOSTNAME=${SEARXNG_HOSTNAME}
+      - SEARXNG_TLS=${LETSENCRYPT_EMAIL}
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+
+  redis:
+    container_name: redis1
+    image: "redis:alpine"
+    command: redis-server --save "" --appendonly "no"
+    networks:
+      - ${NETWORK}
+    tmpfs:
+      - /var/lib/redis
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+
+  searxng:
+    container_name: searxng
+    image: searxng/searxng:latest
+    networks:
+      - ${NETWORK}
+    ports:
+      - "127.0.0.1:${SEARXNG_PORT}:8080"
+    volumes:
+      - ${SEARXNG_DATA_VOLUME}:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME}/
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+networks:
+  ${NETWORK}:
+    external: true
+
+volumes:
+  caddy-data:
+  caddy-config:

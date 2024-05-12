@@ -1,0 +1,40 @@
+version: '3.3'
+services:    
+  cadvisor: 
+    image: gcr.io/cadvisor/cadvisor:latest 
+    container_name: cadvisor 
+    restart: unless-stopped
+    networks:
+      - ${NETWORK}
+    ports: 
+      - ${CADVISOR_PORT}:8080  
+    volumes: 
+      - /:/rootfs:ro 
+      - /var/run:/var/run:rw 
+      - /sys:/sys:ro 
+      - /var/lib/docker/:/var/lib/docker:ro 
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLE}"
+      - "traefik.http.routers.cadvisor.entrypoints=http"
+      - "traefik.http.routers.cadvisor.rule=Host(`${TRAEFIK_HOST}`)"
+      - "traefik.http.middlewares.cadvisor-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.cadvisor.middlewares=cadvisor-https-redirect"
+      - "traefik.http.routers.cadvisor-secure.entrypoints=https"
+      - "traefik.http.routers.cadvisor-secure.rule=Host(`${TRAEFIK_HOST}`)"
+      - "traefik.http.routers.cadvisor-secure.tls=true"
+      - "traefik.http.routers.cadvisor-secure.service=cadvisor"
+      - "traefik.http.services.cadvisor.loadbalancer.server.port=8080"
+      - "traefik.docker.network=${NETWORK}"
+    depends_on: 
+      - redis 
+  redis: 
+    image: redis:latest 
+    container_name: redis
+    networks:
+      - ${NETWORK} 
+    ports: 
+      - ${REDIS_PORT}:6379
+
+networks:
+  ${NETWORK}:
+    external: true

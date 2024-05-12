@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  write-freely:
+    image: nephatrine/write-freely:latest
+    container_name: write-freely
+    networks:
+      - ${NETWORK}
+    environment:
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
+    ports:
+      - "70:70/tcp"
+      - "5678:8080/tcp"
+    restart: unless-stopped
+    volumes:
+      - ./config:/mnt/config
+
+networks:
+  ${NETWORK}:
+    external: true

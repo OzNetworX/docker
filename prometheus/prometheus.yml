@@ -1,0 +1,38 @@
+global:
+  scrape_interval: ${PROMETHEUS_GLOBAL_SCRAPE_INTERVAL}
+  external_labels:
+    monitor: "${PROMETHEUS_EXTERNAL_LABELS_MONITOR}"
+
+scrape_configs:
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["${NODE_EXPORTER_TARGETS}"]
+
+  - job_name: "prometheus" 
+    scrape_interval: ${PROMETHEUS_PROMETHEUS_SCRAPE_INTERVAL}
+    static_configs: 
+      - targets: ["${PROMETHEUS_TARGETS}"]
+
+  - job_name: "cadvisor" 
+    scrape_interval: ${PROMETHEUS_CADVISOR_SCRAPE_INTERVAL}
+    static_configs: 
+      - targets: ["${CADVISOR_TARGETS}"]
+
+  - job_name: "windows-pcs"
+    scrape_interval: ${PROMETHEUS_WINDOWS_PCS_SCRAPE_INTERVAL}
+    static_configs:
+      - targets: ["${WINDOWS_PCS_TARGETS}"]
+
+  - job_name: "pve-exporter"
+    metrics_path: ${PROMETHEUS_PVE_EXPORTER_METRICS_PATH}
+    static_configs:
+      - targets: ["${PVE_EXPORTER_TARGETS}"]
+
+  - job_name: 'pihole'
+    static_configs:
+      - targets: ["${PIHOLE_TARGETS}"]
+
+  - job_name: truenas
+    static_configs:
+      - targets: ["${TRUENAS_TARGETS}"]
+    honor_labels: ${TRUENAS_HONOR_LABELS}

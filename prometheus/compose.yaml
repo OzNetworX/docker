@@ -1,0 +1,17 @@
+version: '3.3'
+
+services:    
+    prometheus:
+        container_name: prometheus
+        networks:
+        - ${NETWORK}
+        restart: unless-stopped 
+        ports:
+        - ${PROMETHEUS_PORTS}:9090
+        volumes:
+        - ${PROMETHEUS_VOLUMES}:/etc/prometheus
+        image: prom/prometheus:latest
+
+networks:
+    ${NETWORK}:
+        external: true

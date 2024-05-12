@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql:5.7
+    networks:
+      - ${NETWORK}
+    volumes:
+      - type: volume
+        source: mysql-data
+        target: /var/lib/mysql
+        read_only: false
+      - type: bind
+        source: ./volumes/docker-entrypoint-initdb.d
+        target: /docker-entrypoint-initdb.d
+        read_only: true
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: "30"
+
+  yourls:
+    # replace "image" with "build" for developing purpose
+    # build: ./Dockerfile
+    #
+    # or even more integrated with theme Sleeky
+    # image: guessi/docker-yourls:1.9.2-theme
+    #
+    # or with "x.y.z-noadmin" for production environment
+    # image: guessi/docker-yourls:1.9.2-noadmin
+    image: guessi/docker-yourls:1.9.2
+    links:
+      - mysql:mysql
+    networks:
+      - ${NETWORK}
+    ports:
+      - ${YOURLZ_PORT}:80
+    depends_on:
+      - mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: "30"
+
+volumes:
+  mysql-data:
+
+networks:
+  ${NETWORK}:
+    external: true

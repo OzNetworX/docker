@@ -1,0 +1,27 @@
+users:
+  Ash: #username for user 1. change to whatever you'd like
+    displayname: "Ash Shepherd" #whatever you want the display name to be
+    password: "$argon2id$v=19$m=1024,t=1,p=8$Y1hIb3J5dVY3TGhRMTlKQQ$QqV6BteAlUvAt9ptDDEC0vllpwkIIb18SaWDSGX+zwo" #generated at https://argon2.online/
+    email: ash@theashnetwork.com #whatever your email address is
+    groups: #enter the groups you want the user to be part of below
+      - admins
+      - dev
+  Le1: #username for user 1. change to whatever you'd like
+    displayname: "Leone Beauchamp" #whatever you want the display name to be
+    password: "$argon2id$v=19$m=1024,t=1,p=8$WDF4SDI2ZHRTeTBFNzZhZQ$VrMJFjcJmJ/14dQmcjzWmownK28ZZPWUtbBjtGmBpz0" #generated at https://argon2.online/
+    email: ash@theashnetwork.com #whatever your email address is
+    groups: #enter the groups you want the user to be part of below
+      - dev
+  Lucy: #username for user 1. change to whatever you'd like
+    displayname: "Lucy Shepherd" #whatever you want the display name to be
+    password: "$argon2id$v=19$m=1024,t=1,p=8$c2pmczZIQ1ZMeEF0ZzI2Rw$/GCs3G+wDhcBVr7fyjPw6mWOtu2awTj+sNvNFcE5J5w" #generated at https://argon2.online/
+    email: ash@theashnetwork.com #whatever your email address is
+    groups: #enter the groups you want the user to be part of below
+      - dev
+  Clint: #username for user 1. change to whatever you'd like
+    displayname: "Clint Macsimus" #whatever you want the display name to be
+    password: "$argon2id$v=19$m=1024,t=1,p=8$OEVHS0o1UVl6ZXMzcWFzcg$rZmQwfu9Tko76s5F+COjSAwPYQmdsoXlMjgylnGrdpw" #generated at https://argon2.online/
+    email: ash@theashnetwork.com #whatever your email address is
+    groups: #enter the groups you want the user to be part of below
+      - dev
+      #any time you add a new user, you will need to restart the Authelia container to recognize the new settings/rules

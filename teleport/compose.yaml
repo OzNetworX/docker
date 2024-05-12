@@ -1,0 +1,28 @@
+version: '3'
+services:
+  teleport:
+    image: quay.io/gravitational/teleport:11.1.2
+    container_name: teleport
+    networks:
+      - ${NETWORK}
+    entrypoint: /bin/sh
+    hostname: ${TELEPORT_HOSTNAME}
+    command: -c "sleep 1 && /bin/dumb-init teleport start -c /etc/teleport/teleport.yaml"
+    ports:
+      - "${TELEPORT_PORT_1}:3022"
+      - "${TELEPORT_PORT_2}:3023"
+      - "${TELEPORT_PORT_3}:3024"
+      - "${TELEPORT_PORT_4}:3025"
+      - "${TELEPORT_PORT_5}:3026"
+      - "${TELEPORT_PORT_6}:3027"
+      - "${TELEPORT_PORT_7}:3028"
+      - "${TELEPORT_PORT_8}:3036"
+      - "${TELEPORT_PORT_9}:3080"
+    restart: always
+    volumes:
+      - ${TELEPORT_CONFIG_VOLUME}:/etc/teleport
+      - ${TELEPORT_DATA_VOLUME}:/var/lib/teleport
+
+networks:
+  ${NETWORK}:
+    external: true

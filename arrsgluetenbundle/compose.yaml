@@ -1,0 +1,121 @@
+version: "3"
+
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - ${CAP_ADD_NET_ADMIN}
+    networks:
+      - ${NETWORK}
+    ports:
+      - ${PORTS_6881}
+      - ${PORTS_6881_UDP}
+      - ${PORTS_8084} # qbittorrent
+      - ${PORTS_9117} # Jackett
+      - ${PORTS_8989} # Sonarr
+      - ${PORTS_9696} # Prowlarr
+      - ${PORTS_6767} # Bazarr
+      - ${PORTS_3579} # Ombi
+      - ${PORTS_7878} # Radarr
+    volumes:
+      - ${GLUETUN_VOLUME}:/gluetun
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - SERVER_REGIONS=${SERVER_REGIONS}
+      - TZ=${TZ}
+      - UPDATER_PERIOD=${UPDATER_PERIOD}
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - AUTO_UPDATE=${JACKETT_AUTO_UPDATE}
+    volumes:
+      - ${JACKETT_VOLUME}:/config
+      - ${JACKETT_DOWNLOADS_VOLUME}:/downloads
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=${QB_WEBUI_PORT}
+    volumes:
+      - ${QB_VOLUME}:/config
+      - ${QB_DOWNLOADS_VOLUME}:/downloads
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${PROWLARR_VOLUME}:/config
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${BAZARR_VOLUME}:/config
+      - ${BAZARR_MOVIES_VOLUME}:/movies
+      - ${BAZARR_TV_VOLUME}:/tv
+
+  ombi:
+    image: lscr.io/linuxserver/ombi:latest
+    container_name: ombi
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - BASE_URL=${OMBI_BASE_URL}
+    volumes:
+      - ${OMBI_VOLUME}:/config
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${SONARR_VOLUME}:/config
+      - ${SONARR_TV_VOLUME}:/tv
+      - ${SONARR_DOWNLOADS_VOLUME}:/downloads
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${RADARR_VOLUME}:/config
+      - ${RADARR_MOVIES_VOLUME}:/movies
+      - ${RADARR_DOWNLOADS_VOLUME}:/downloads
+
+networks:
+  ${NETWORK}:
+    external: true

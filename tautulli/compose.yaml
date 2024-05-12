@@ -1,0 +1,20 @@
+version: '3'
+services:
+  tautulli:
+    image: tautulli/tautulli:latest
+    container_name: tautulli
+    networks:
+      - ${NETWORK}
+    restart: unless-stopped
+    volumes:
+      - ${TAUTULLI_CONFIG_VOLUME}:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    ports:
+      - ${TAUTULLI_PORT}:8181
+
+networks:
+    ${NETWORK}:
+      external: true

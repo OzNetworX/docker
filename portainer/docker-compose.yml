@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer-ee:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:${PORTAINER_SECURITY_OPT_NO_NEW_PRIVILEGES}
+    networks:
+      - ${PORTAINER_NETWORK}
+    ports:
+      - ${PORTAINER_PORT_HOST_1}:9443
+      - ${PORTAINER_PORT_HOST_2}:8000
+    volumes:
+      - ${PORTAINER_VOLUME_ETC_LOCALTIME}:/etc/localtime:ro
+      - ${PORTAINER_VOLUME_DOCKER_SOCK}:/var/run/docker.sock:ro
+      - ${PORTAINER_VOLUME_DATA}:/data
+    labels:
+      - "traefik.enable=${PORTAINER_TRAEFIK_ENABLE}"
+      - "traefik.http.routers.portainer.entrypoints=${PORTAINER_TRAEFIK_HTTP_ROUTERS_ENTRYPOINTS}"
+      - "traefik.http.routers.portainer.rule=Host(`${PORTAINER_TRAEFIK_HOSTNAME}`)"
+      - "traefik.http.middlewares.portainer-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.portainer.middlewares=portainer-https-redirect"
+      - "traefik.http.routers.portainer-secure.entrypoints=https"
+      - "traefik.http.routers.portainer-secure.rule=Host(`${PORTAINER_TRAEFIK_HOSTNAME}`)"
+      - "traefik.http.routers.portainer-secure.tls=${PORTAINER_TRAEFIK_HTTP_ROUTERS_SECURE_TLS}"
+      - "traefik.http.routers.portainer-secure.service=portainer"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.docker.network=${PORTAINER_NETWORK}"
+
+networks:
+  ${PORTAINER_NETWORK}:
+    external: ${PORTAINER_NETWORK_EXTERNAL}
+

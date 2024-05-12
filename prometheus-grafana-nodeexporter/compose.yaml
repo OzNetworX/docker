@@ -1,0 +1,15 @@
+services:
+  grafana:
+    container_name: grafana
+    networks:
+      - ${GRAFANA_NETWORK}
+    ports:
+      - '${GRAFANA_PORTS}:3000'
+    volumes:
+      - ${GRAFANA_VOLUME_DATA}:/var/lib/grafana
+      - ${GRAFANA_VOLUME_CONFIG}:/etc/grafana
+    image: grafana/grafana:latest
+
+networks:
+  ${GRAFANA_NETWORK}:
+    external: true

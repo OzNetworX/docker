@@ -1,0 +1,17 @@
+    grafana:
+        container_name: grafana
+        user: '1000'
+        ports:
+            - '3457:3000' #modify 3457 to your setup needs
+        volumes:
+            - /data/compose/promgrafnode/grafana/data:/var/lib/grafana
+            - /data/compose/promgrafnode/grafana/config:/etc/grafana
+    grafana:
+        container_name: grafana
+        ports:
+            - '3457:3000' #modify 3457 to your setup needs
+        volumes:
+            - /data/compose/promgrafnode/grafana/data:/var/lib/grafana
+            - /data/compose/promgrafnode/grafana:/etc/grafana
+        image: grafana/grafana:latest
+        image: grafana/grafana:latest

@@ -1,0 +1,17 @@
+version: '3.3'
+services:
+  grafana:
+    container_name: grafana
+    networks:
+      - ${NETWORK_NAME}
+    restart: unless-stopped
+    user: "${GRAFANA_USER}"
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    volumes:
+      - ${GRAFANA_DATA_VOLUME}:/var/lib/grafana
+    image: grafana/grafana:latest
+
+networks:
+  ${NETWORK_NAME}:
+    external: true

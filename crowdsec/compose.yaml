@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    environment:
+      GID: "${GID}"
+      COLLECTIONS: "${COLLECTIONS}"
+    volumes:
+      - ${CROWDSEC_ACQUIS_VOLUME}:/etc/crowdsec/acquis.yaml
+      - ${CROWDSEC_DATA_VOLUME}:/var/lib/crowdsec/data/
+      - ${CROWDSEC_CONFIG_VOLUME}:/etc/crowdsec/
+      - ${TRAEFIK_LOGS_LOCATION}:/var/log/traefik/:ro
+    networks:
+      - ${NETWORK}
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  bouncer-traefik:
+    image: docker.io/fbonalair/traefik-crowdsec-bouncer:latest
+    container_name: bouncer-traefik
+    environment:
+      CROWDSEC_BOUNCER_API_KEY: "${CROWDSEC_BOUNCER_API_KEY}"
+      CROWDSEC_AGENT_HOST: "${CROWDSEC_AGENT_HOST}"
+    networks:
+      - ${NETWORK}
+    depends_on:
+      - crowdsec
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  ${NETWORK}:
+    external: true

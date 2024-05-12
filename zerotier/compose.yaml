@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  ztncui:
+    image: keynetworks/ztncui
+    container_name: ztncui
+    environment:
+      - USER_UID=${USER_UID}
+      - USER_GID=${USER_GID} 
+      - NODE_ENV=${NODE_ENV}
+      - HTTPS_PORT=${HTTPS_PORT}
+      - ZTNCUI_PASSWD=${ZTNCUI_PASSWD} 
+      - MYDOMAIN=${MYDOMAIN} 
+    volumes:
+      - ${ZT_KEYS_VOLUME}:/opt/key-networks/ztncui/etc
+      - ${ZT_DATA_VOLUME}:/var/lib/zerotier-one
+    ports:
+      - "${HTTPS_PORT}:3443"
+      - "${PORT_3180}:3180"

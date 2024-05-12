@@ -1,0 +1,35 @@
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    networks:
+      - ${QBITTORRENT_NETWORK}
+    ports:
+      - '${QBITTORRENT_PORTS}:6881'
+      - '${QBITTORRENT_PORTS_UDP}:6881/udp'
+      - '${QBITTORRENT_WEBUI_PORT}:8084' # qbittorrent
+    environment:
+      - PUID=${QBITTORRENT_PUID}
+      - PGID=${QBITTORRENT_PGID}
+      - TZ=${QBITTORRENT_TZ}
+      - WEBUI_PORT=${QBITTORRENT_WEBUI_PORT}
+    volumes:
+      - ${QBITTORRENT_VOLUME_CONFIG}:/config
+      - ${QBITTORRENT_VOLUME_DOWNLOADS}:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.downloads.entrypoints=http"
+      - "traefik.http.routers.downloads.rule=Host(`${QBITTORRENT_HOST}`)"
+      - "traefik.http.middlewares.downloads-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.downloads.middlewares=downloads-https-redirect"
+      - "traefik.http.routers.downloads-secure.entrypoints=https"
+      - "traefik.http.routers.downloads-secure.rule=Host(`${QBITTORRENT_HOST}`)"
+      - "traefik.http.routers.downloads-secure.tls=true"
+      - "traefik.http.routers.downloads-secure.service=downloads"
+      - "traefik.http.services.downloads.loadbalancer.server.port=${QBITTORRENT_WEBUI_PORT}"
+      - "traefik.docker.network=${QBITTORRENT_NETWORK}"
+    restart: unless-stopped
+
+networks:
+  ${QBITTORRENT_NETWORK}:
+    external: true

@@ -1,0 +1,38 @@
+version: '3.3'
+services:
+    speedtest:
+        container_name: speedtest
+        image: henrywhitaker3/speedtest-tracker
+        ports:
+            - ${SPEEDTEST_PORT}:80
+        networks:
+            - ${NETWORK}
+        volumes:
+            - ${SPEEDTEST_CONFIG_VOLUME}:/config
+        environment:
+            - TZ=${TZ}
+            - PGID=${PGID}
+            - PUID=${PUID}
+            - OOKLA_EULA_GDPR=${OOKLA_EULA_GDPR}
+        logging:
+            driver: "json-file"
+            options:
+                max-file: ${LOG_MAX_FILE}
+                max-size: ${LOG_MAX_SIZE}
+        restart: unless-stopped
+        labels:
+            - "traefik.enable=${TRAEFIK_ENABLE}"
+            - "traefik.http.routers.speedtest.entrypoints=http"
+            - "traefik.http.routers.speedtest.rule=Host(`${TRAEFIK_HOSTNAME}`)"
+            - "traefik.http.middlewares.speedtest-https-redirect.redirectscheme.scheme=https"
+            - "traefik.http.routers.speedtest.middlewares=speedtest-https-redirect"
+            - "traefik.http.routers.speedtest-secure.entrypoints=https"
+            - "traefik.http.routers.speedtest-secure.rule=Host(`${TRAEFIK_HOSTNAME}`)"
+            - "traefik.http.routers.speedtest-secure.tls=true"
+            - "traefik.http.routers.speedtest-secure.service=speedtest"
+            - "traefik.http.services.speedtest.loadbalancer.server.port=80"
+            - "traefik.docker.network=${NETWORK}"
+
+networks:
+    ${NETWORK}:
+        external: true

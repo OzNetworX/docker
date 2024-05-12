@@ -1,0 +1,8 @@
+---
+version: '3'
+
+services:
+
+  zammad-nginx:
+    ports:
+      - "2185:8080"

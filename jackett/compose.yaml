@@ -1,0 +1,35 @@
+version: "2.1"
+services:
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    networks:
+      - ${NETWORK}
+    ports:
+      - "${JACKETT_PORT}:9117"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - AUTO_UPDATE=${AUTO_UPDATE}
+      #- RUN_OPTS= #optional
+    volumes:
+      - ${CONFIG_VOLUME}:/config
+      - ${DOWNLOADS_VOLUME}:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scrape.entrypoints=http"
+      - "traefik.http.routers.scrape.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.middlewares.scrape-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.scrape.middlewares=scrape-https-redirect"
+      - "traefik.http.routers.scrape-secure.entrypoints=https"
+      - "traefik.http.routers.scrape-secure.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.routers.scrape-secure.tls=true"
+      - "traefik.http.routers.scrape-secure.service=scrape"
+      - "traefik.http.services.scrape.loadbalancer.server.port=9117"
+      - "traefik.docker.network=${NETWORK}"
+    restart: unless-stopped
+
+networks:
+  ${NETWORK}:
+    external: true
